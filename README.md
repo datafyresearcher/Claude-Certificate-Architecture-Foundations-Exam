@@ -36,7 +36,7 @@
 
 **✅ Correct Answer: D**
 
-> **Explanation:** Critical business rules that cannot be bypassed must live in code the model cannot influence — not in instructions it can ignore. Moving the threshold check _inside_ the tool means it executes unconditionally, regardless of how the model is prompted or what parameters it passes. Option A relies on the model choosing the correct tool. Option B via a hook is closer, but only adds a _flag_ that the tool still checks — a parameter the model could still manipulate. Option C is the weakest: it puts a safety-critical boolean directly under model control. Tool-internal enforcement is the only truly tamper-proof design.
+> **Explanation:** Critical business rules that should not be bypassable by prompting alone belong in trusted server-side code — not only in instructions the model may ignore. Moving the threshold check _inside_ the tool means it executes as part of disbursement logic, regardless of how the model is prompted or which parameters it passes. Option A relies on the model choosing the correct tool. Option B via a hook is closer, but only adds a _flag_ that the tool still checks — a parameter the model could still manipulate. Option C is the weakest: it puts a safety-critical boolean directly under model control. Tool-internal enforcement is the strongest tamper-resistant pattern here because policy runs in trusted code paths independent of model-controlled approval bits.
 
 ---
 
@@ -51,7 +51,7 @@
 
 **✅ Correct Answer: C**
 
-> **Explanation:** A 3% failure rate on a safety-critical rule means the model is non-deterministically ignoring system prompt instructions. The only solution that provides _guaranteed_ compliance is enforcement at the infrastructure layer via a hook — code that runs regardless of model behavior and physically blocks the non-compliant tool call. Options A and B iterate on the failing approach (prompting). Option D is better than prompting but still relies on the model to then escalate after seeing the error; a hook eliminates that dependency entirely.
+> **Explanation:** A 3% failure rate on a safety-critical rule means the model is non-deterministically ignoring system prompt instructions. The approach that best matches *guaranteed* compliance here is enforcement at the infrastructure layer via a hook — code that runs regardless of model behavior and blocks the non-compliant tool call before it executes. Options A and B iterate on the failing approach (prompting). Option D is better than prompting but still relies on the model to then escalate after seeing the error; a hook eliminates that dependency entirely.
 
 ---
 
@@ -231,7 +231,7 @@
 
 **✅ Correct Answer: C**
 
-> **Explanation:** Unlike Q20 (an unambiguous, emphatic demand), this customer is expressing frustration and a preference — not an absolute command. They want the _problem solved_, and the agent _can_ solve it right now. The right response is to acknowledge their frustration, provide new information ("this is actually resolvable right now"), and give them the choice. Processing without asking (D) ignores their stated preference. Immediate escalation (B) ignores that the agent can fully resolve the issue. More questions (A) adds the very friction they're complaining about.
+> **Explanation:** Unlike Question 6 (an unambiguous, emphatic demand), this customer is expressing frustration and a preference — not an absolute command. They want the _problem solved_, and the agent _can_ solve it right now. The right response is to acknowledge their frustration, provide new information ("this is actually resolvable right now"), and give them the choice. Processing without asking (D) ignores their stated preference. Immediate escalation (B) ignores that the agent can fully resolve the issue. More questions (A) adds the very friction they're complaining about.
 
 ---
 
@@ -434,7 +434,7 @@
 
 **✅ Correct Answer: A**
 
-> **Explanation:** Enums are ideal when the valid set of values is small, fixed, and known at design time. They constrain the model to valid inputs, prevent typos, and make the interface self-documenting. Claude handles the semantic mapping from "research database" → `"research_papers"` naturally. Freeform strings (B, C) introduce unnecessary validation complexity. Searching all databases (D) is wasteful and may flood the orchestrator with irrelevant noise across 15 questions.
+> **Explanation:** Enums are ideal when the valid set of values is small, fixed, and known at design time. They constrain the model to valid inputs, prevent typos, and make the interface self-documenting. Claude handles the semantic mapping from "research database" → `"research_papers"` naturally. Freeform strings (B, C) introduce unnecessary validation complexity. Searching all databases (D) is wasteful and may flood the orchestrator with irrelevant noise on each request.
 
 ---
 
@@ -556,7 +556,7 @@
 **Your music discovery assistant should consistently maintain an enthusiastic tone, explain its reasoning for each recommendation, and ask clarifying questions to better understand user preferences. You want this behavior to persist reliably across all user interactions. Where should you define these behavioral guidelines?**
 
 - A: In the first assistant message, instructing Claude to follow these guidelines going forward.
-- B: In environmental variables that your application passes to the API client.
+- B: In environment variables that your application passes to the API client.
 - C: Prepended to each user message before sending to the API.
 - D: ✅ In the system prompt.
 
@@ -945,6 +945,6 @@
 
 **✅ Correct Answer: B**
 
-> **Explanation:** Prompt caching is specifically designed for this use case: a fixed system prompt repeated across thousands of requests. Cached tokens are billed at significantly reduced rates compared to uncached input tokens. With a 1,800-token system prompt across 8,000 daily requests, caching eliminates approximately 14.4M tokens/day from full-price input processing. Option A (multi-document batching per call) reduces request count but complicates response parsing and doesn't reduce token cost per document. Option C (shorter prompt) risks degrading extraction quality — the normalization rules and schema documentation are doing real work. Option D addresses per-batch API overhead, which is not the dominant cost in this scenario; token cost is.
+> **Explanation:** Prompt caching is designed for this use case: a fixed system prompt repeated across many requests. Cached tokens are billed at significantly reduced rates compared to uncached input tokens when cache reads apply. Message Batches support prompt caching, but because batch requests are processed asynchronously and concurrently, cache hits are best-effort — include identical `cache_control` blocks and follow Anthropic’s batch + caching guidance to maximize hit rates. With a 1,800-token system prompt across 8,000 daily requests, successful cache reuse can greatly reduce full-price input-token spend versus no caching. Option A (multi-document batching per call) reduces request count but complicates response parsing and doesn't reduce token cost per document. Option C (shorter prompt) risks degrading extraction quality — the normalization rules and schema documentation are doing real work. Option D addresses per-batch API overhead, which is not the dominant cost in this scenario; token cost is.
 
 ---
