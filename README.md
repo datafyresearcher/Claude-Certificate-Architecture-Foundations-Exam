@@ -6,10 +6,6 @@
 
 This repository is a personal study hub. It is designed to organize learning resources and revision flow for CCA-F preparation; it is not an official certification repository and does not guarantee exam results.
 
-## Inspired By
-
-This README structure is inspired by the roadmap-style layout used in [thecryptoshed/eth-dapp-developer-roadmap](https://github.com/thecryptoshed/eth-dapp-developer-roadmap).
-
 ## Roadmap
 
 1. Start with the guide
