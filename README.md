@@ -16,6 +16,7 @@ This repository also includes supporting CCA-F preparation materials:
 2. [Claude Certified Architect Practice Tests on Udemy](https://www.udemy.com/course/claude-certified-architect-practice-tests/learn/quiz/7507481#overview)
 3. [Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
 4. [YouTube tutorial module links](CCA-F%20Exams%20Prepration/Youtube%20Tutorial/Youtube%20Link.txt)
+5. [Claude Certified Architect slide decks](CCA-F%20Exams%20Prepration/slide%20decks/)
 
 ![Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
 
