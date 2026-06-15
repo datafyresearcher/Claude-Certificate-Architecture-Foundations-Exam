@@ -8,6 +8,10 @@
 
 - YouTube tutorial list with 20 modules: [Youtube Link.txt](../Youtube%20Tutorial/Youtube%20Link.txt)
 
+## Local Question Bank
+
+- 60-question study guide: [60-questions.md](60-questions.md)
+
 ## Slides
 
 - Local slide decks: [slide decks](../slide%20decks/)
