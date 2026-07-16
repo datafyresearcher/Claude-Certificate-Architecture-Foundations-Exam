@@ -24,10 +24,8 @@
 ## Practice Tests
 
 - Free practice questions: <https://claudecertifications.com/claude-certified-architect/practice-questions#main-content>
-- Paid Udemy practice tests:
-  - <https://www.udemy.com/course/new-claude-certified-architect-foundations-cca-f-exams/?couponCode=KEEPLEARNING>
-  - <https://www.udemy.com/course/claude-certified-architect-practice-tests/>
-  - <https://www.udemy.com/course/anthropic-claude-certified-architect-3-full-practice-exams/>
+- Practice Test 1: Claude Certified Architect Foundations (v2.0): <https://bit.ly/3RccpEO>
+- Practice Test 2: Claude Certified Architect Foundations (v2.0): <https://bit.ly/4gCfsQZ>
 
 ## Notes for Maintainers
 

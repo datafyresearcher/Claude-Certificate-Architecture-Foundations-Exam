@@ -14,7 +14,7 @@ Use this repository for preparation only. The protected exam does not allow AI a
 4. Work through the local 60-question guide: [60-questions.md](60-questions.md)
 5. Study the Claude Code documentation: <https://code.claude.com/docs/en/overview>
 6. Take the free practice test: <https://claudecertifications.com/claude-certified-architect/practice-questions#main-content>
-7. Use paid Udemy practice tests only if you have subscription access: [Udemy Link.txt](../Udemy-CCA-F-6%20Practice%20Tests/Udemy%20Link.txt)
+7. Take the practice tests: [Udemy Link.txt](../Udemy-CCA-F-6%20Practice%20Tests/Udemy%20Link.txt)
 8. Complete free Anthropic courses: <https://anthropic.skilljar.com/>
 
 ## Core Competency Checklist

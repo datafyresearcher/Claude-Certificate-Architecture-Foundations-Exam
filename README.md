@@ -16,7 +16,7 @@ This repository also includes supporting CCA-F preparation materials:
 2. [CCA-F guide PDF](CCA-F%20Exams%20Prepration/guide/guide_en.pdf)
 3. [YouTube tutorial module links](CCA-F%20Exams%20Prepration/Youtube%20Tutorial/Youtube%20Link.txt) - all 20 modules.
 4. [Claude Certified Architect slide decks](CCA-F%20Exams%20Prepration/slide%20decks/)
-5. [Udemy practice-test links](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Udemy%20Link.txt)
+5. [Practice Tests](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Udemy%20Link.txt)
 6. [Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
 
 ### Study Path
@@ -28,10 +28,9 @@ The Claude Certified Architect - Foundation exam is treated here as an advanced,
 3. Review the [slide deck folder](CCA-F%20Exams%20Prepration/slide%20decks/) alongside the video modules.
 4. Study the [Claude Code documentation](https://code.claude.com/docs/en/overview), especially the areas around Claude Code, Agent SDK, MCP, context management, hooks, skills, CI/CD, and structured output.
 5. Attempt the free practice test: [Claude Certified Architect practice questions](https://claudecertifications.com/claude-certified-architect/practice-questions#main-content).
-6. Use the paid Udemy practice tests only if you have access through a Udemy subscription:
-   - [New Claude Certified Architect Foundations CCA-F Exams](https://www.udemy.com/course/new-claude-certified-architect-foundations-cca-f-exams/?couponCode=KEEPLEARNING)
-   - [Claude Certified Architect Practice Tests](https://www.udemy.com/course/claude-certified-architect-practice-tests/)
-   - [Anthropic Claude Certified Architect: 3 Full Practice Exams](https://www.udemy.com/course/anthropic-claude-certified-architect-3-full-practice-exams/)
+6. Practice Tests:
+   - [Practice Test 1: Claude Certified Architect Foundations (v2.0)](https://bit.ly/3RccpEO)
+   - [Practice Test 2: Claude Certified Architect Foundations (v2.0)](https://bit.ly/4gCfsQZ)
 7. Complete the free Anthropic courses at [anthropic.skilljar.com](https://anthropic.skilljar.com/) before scheduling the certification attempt.
 
 ![Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)

@@ -1,12 +1,9 @@
-Paid Udemy practice tests for CCA-F preparation:
+Practice Tests for CCA-F preparation:
 
-1. New Claude Certified Architect Foundations CCA-F Exams
-https://www.udemy.com/course/new-claude-certified-architect-foundations-cca-f-exams/?couponCode=KEEPLEARNING
+1. Practice Test 1: Claude Certified Architect Foundations (v2.0)
+https://bit.ly/3RccpEO
 
-2. Claude Certified Architect Practice Tests
-https://www.udemy.com/course/claude-certified-architect-practice-tests/
-
-3. Anthropic Claude Certified Architect: 3 Full Practice Exams
-https://www.udemy.com/course/anthropic-claude-certified-architect-3-full-practice-exams/
+2. Practice Test 2: Claude Certified Architect Foundations (v2.0)
+https://bit.ly/4gCfsQZ
 
 Note: These are paid Udemy resources and may require a Udemy subscription or separate purchase.
