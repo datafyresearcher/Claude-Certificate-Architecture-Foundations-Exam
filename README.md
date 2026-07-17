@@ -16,7 +16,7 @@ This repository also includes supporting CCA-F preparation materials:
 2. [CCA-F guide PDF](CCA-F%20Exams%20Prepration/guide/guide_en.pdf)
 3. [YouTube tutorial module links](CCA-F%20Exams%20Prepration/Youtube%20Tutorial/Youtube%20Link.txt) - all 20 modules.
 4. [Claude Certified Architect slide decks](CCA-F%20Exams%20Prepration/slide%20decks/)
-5. [25 Google Forms Practice Tests](CCA-F%20Exams%20Prepration/learning/practice-tests.md)
+5. [Udemy Practice Tests](CCA-F%20Exams%20Prepration/learning/practice-tests.md)
 6. [Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
 
 ### Study Path
@@ -28,7 +28,7 @@ The Claude Certified Architect - Foundation exam is treated here as an advanced,
 3. Review the [slide deck folder](CCA-F%20Exams%20Prepration/slide%20decks/) alongside the video modules.
 4. Study the [Claude Code documentation](https://code.claude.com/docs/en/overview), especially the areas around Claude Code, Agent SDK, MCP, context management, hooks, skills, CI/CD, and structured output.
 5. Attempt the free practice test: [Claude Certified Architect practice questions](https://claudecertifications.com/claude-certified-architect/practice-questions#main-content).
-6. Review the [25 Google Forms practice tests](CCA-F%20Exams%20Prepration/learning/practice-tests.md) for Q1 previews of all tests
+6. Review the [Udemy practice tests](CCA-F%20Exams%20Prepration/learning/practice-tests.md).
 7. Complete the free Anthropic courses at [anthropic.skilljar.com](https://anthropic.skilljar.com/) before scheduling the certification attempt.
 
 ![Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
