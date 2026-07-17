@@ -16,9 +16,8 @@ This repository also includes supporting CCA-F preparation materials:
 2. [CCA-F guide PDF](CCA-F%20Exams%20Prepration/guide/guide_en.pdf)
 3. [YouTube tutorial module links](CCA-F%20Exams%20Prepration/Youtube%20Tutorial/Youtube%20Link.txt) - all 20 modules.
 4. [Claude Certified Architect slide decks](CCA-F%20Exams%20Prepration/slide%20decks/)
-5. [Practice Tests (Udemy)](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Udemy%20Link.txt)
-6. [25 Google Forms Practice Tests](CCA-F%20Exams%20Prepration/learning/practice-tests.md)
-7. [Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
+5. [25 Google Forms Practice Tests](CCA-F%20Exams%20Prepration/learning/practice-tests.md)
+6. [Udemy practice-test screenshot](CCA-F%20Exams%20Prepration/Udemy-CCA-F-6%20Practice%20Tests/Screenshot.png)
 
 ### Study Path
 
