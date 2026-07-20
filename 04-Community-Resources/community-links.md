@@ -30,6 +30,19 @@
 - [Claude Code GitHub repository](https://github.com/anthropics/claude-code) — source repository, issue tracker, releases, and community discussions
 - [MCP Servers](https://github.com/modelcontextprotocol/servers) — reference and community Model Context Protocol server implementations
 
+## Additional Unofficial Practice Resources
+
+Use these for question volume and pattern practice. None are affiliated with Anthropic; when they disagree with the documentation, the documentation wins.
+
+- [SGridworks 12-week training program](https://github.com/SGridworks/claude-certified-architect-training) — 110 practice questions, exam simulations, and a retro RPG study game
+  - Practice content is in the repository's `practice-tests/` and `game/` folders.
+  - Drift note: the repository lists project memory at `.claude/CLAUDE.md`. Current Claude Code documentation supports both `./CLAUDE.md` and `./.claude/CLAUDE.md` for project instructions. Verify memory locations and Skill frontmatter fields against the live documentation.
+- [Exam guide breakdown](https://claudecertifications.com/claude-certified-architect/exam-guide) — domains, scenarios, anti-patterns, and exam-format overview
+- [Mock exam platform](https://www.anthropiccertifications.com/) — full mock exams and domain analytics; the site currently gives inconsistent counts of five and six mock sets
+- [CertSafari practice question bank](https://www.certsafari.com/anthropic/claude-certified-architect) — practice questions with answer rationales
+- [Rick Hightower's eight-part preparation series](https://pub.towardsai.net/claude-certified-architect-the-complete-guide-to-passing-the-cca-foundations-exam-9665ce7342a8)
+- [Balaji's preparation guide](https://dynamicbalaji.medium.com/claude-certified-architect-foundations-certification-preparation-guide-c70546b51f51) — especially useful for terminology gaps
+
 ## How to Evaluate a Community Resource
 
 Before relying on a community resource:
