@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F Honeypot Drills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECEEF1;
+    --card:#FFFFFF;
+    --ink:#1A222E;
+    --ink-soft:#5A6676;
+    --line:#C9CFD8;
+    --indigo:#2C3FBE;
+    --indigo-soft:#E4E7F9;
+    --honey:#A85E00;
+    --honey-bg:#F8ECD2;
+    --green:#17714A;
+    --green-bg:#DFF0E6;
+    --red:#A83240;
+    --red-bg:#F6E0E3;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:16px}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    line-height:1.55;
+    min-height:100vh;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:24px 20px 80px}
+
+  /* ---------- top bar ---------- */
+  header{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;margin-bottom:18px;
+  }
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-weight:800;font-size:1.5rem;letter-spacing:-0.01em;
+  }
+  h1 .hp{color:var(--honey)}
+  .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem;color:var(--ink-soft);
+  }
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:0.75rem;font-weight:500;
+    border:1.5px solid var(--line);background:var(--card);color:var(--ink-soft);
+    border-radius:999px;padding:6px 14px;cursor:pointer;transition:all .15s;
+  }
+  .chip:hover{border-color:var(--ink-soft)}
+  .chip.on{border-color:var(--indigo);background:var(--indigo-soft);color:var(--indigo);font-weight:600}
+  .chip:focus-visible,.opt:focus-visible,.btn:focus-visible{
+    outline:3px solid var(--indigo);outline-offset:2px;
+  }
+
+  /* ---------- progress ---------- */
+  .prog{
+    display:flex;align-items:center;gap:14px;margin-bottom:18px;
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--ink-soft);
+  }
+  .prog-rail{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+  .prog-fill{height:100%;background:var(--indigo);width:0%;transition:width .3s ease}
+  @media (prefers-reduced-motion:reduce){
+    .prog-fill{transition:none}
+    .rationale,.opt{transition:none !important;animation:none !important}
+  }
+
+  /* ---------- question card ---------- */
+  .qcard{
+    background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);
+    padding:26px 28px;margin-bottom:20px;
+  }
+  .eyebrow{
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:.04em;
+  }
+  .dtag{
+    padding:3px 9px;border-radius:4px;font-weight:600;
+    background:var(--indigo-soft);color:var(--indigo);
+  }
+  .stag{color:var(--ink-soft)}
+  .scenario{
+    border-left:3px solid var(--line);padding:2px 0 2px 16px;margin-bottom:16px;
+    color:#38424f;font-size:0.95rem;
+  }
+  .scenario .slabel{
+    display:block;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;
+    letter-spacing:.1em;color:var(--ink-soft);margin-bottom:4px;
+  }
+  .stem{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:700;
+    font-size:1.08rem;margin-bottom:18px;letter-spacing:-0.005em;
+  }
+  code,.mono{font-family:'IBM Plex Mono',monospace;font-size:0.88em;background:#F1F3F6;padding:1px 5px;border-radius:4px}
+
+  /* ---------- options ---------- */
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+    background:var(--card);border:1.5px solid var(--line);border-radius:8px;
+    padding:13px 15px;cursor:pointer;font:inherit;font-size:0.94rem;color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:var(--indigo)}
+  .opt:disabled{cursor:default}
+  .opt .key{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:0.8rem;
+    border:1.5px solid var(--line);border-radius:5px;min-width:26px;height:26px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink-soft);
+  }
+  .opt .body{flex:1}
+  .opt .verdict{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;
+    font-weight:600;letter-spacing:.08em;padding:2px 8px;border-radius:4px;margin-bottom:5px;
+  }
+  .opt .why{display:block;font-size:0.85rem;color:var(--ink-soft);margin-top:6px}
+  .opt.reveal-correct{border-color:var(--green);background:var(--green-bg)}
+  .opt.reveal-correct .verdict{background:var(--green);color:#fff}
+  .opt.reveal-honeypot{border-color:var(--honey);background:var(--honey-bg)}
+  .opt.reveal-honeypot .verdict{background:var(--honey);color:#fff}
+  .opt.reveal-wrongpick{border-color:var(--red);background:var(--red-bg)}
+  .opt.reveal-wrongpick .verdict{background:var(--red);color:#fff}
+  .opt.picked .key{border-color:var(--ink);color:var(--ink)}
+
+  /* ---------- rationale / pattern ---------- */
+  .rationale{margin-top:18px;display:none}
+  .rationale.show{display:block}
+  .pattern{
+    border:1.5px solid var(--ink);border-radius:8px;padding:13px 16px;
+    background:#F7F8FA;font-size:0.92rem;
+  }
+  .pattern .plabel{
+    font-family:'IBM Plex Mono',monospace;font-size:0.68rem;font-weight:600;
+    letter-spacing:.1em;color:var(--indigo);display:block;margin-bottom:4px;
+  }
+  .result-line{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1rem;
+    margin-bottom:10px;
+  }
+  .result-line.good{color:var(--green)}
+  .result-line.bad{color:var(--red)}
+  .result-line.trapped{color:var(--honey)}
+
+  /* ---------- buttons ---------- */
+  .btnrow{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+  .btn{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:0.82rem;
+    border:1.5px solid var(--ink);border-radius:8px;padding:10px 22px;cursor:pointer;
+    background:var(--ink);color:#fff;transition:opacity .15s;
+  }
+  .btn:hover{opacity:.85}
+  .btn.ghost{background:var(--card);color:var(--ink)}
+
+  /* ---------- summary ---------- */
+  .sum h2{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.6rem;
+    margin-bottom:6px;letter-spacing:-0.01em;
+  }
+  .sum .subtitle{color:var(--ink-soft);margin-bottom:24px;font-size:0.95rem}
+  .dom-row{margin-bottom:20px}
+  .dom-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:0.9rem;margin-bottom:6px;
+  }
+  .dom-head .nm{font-weight:600}
+  .dom-head .pc{font-family:'IBM Plex Mono',monospace;font-size:0.8rem}
+  .bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;position:relative}
+  .bar .fill{height:100%;background:var(--indigo);border-radius:7px}
+  .legend{
+    font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--ink-soft);
+    margin:4px 0 0;display:flex;gap:16px;
+  }
+  .missed{margin-top:26px}
+  .missed h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;margin-bottom:10px}
+  .missed ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .missed li{
+    background:var(--card);border:1.5px solid var(--line);border-radius:8px;
+    padding:10px 14px;font-size:0.88rem;
+  }
+  .missed li .mono{background:none;padding:0;color:var(--honey);font-weight:600}
+  .hintbox{display:none;margin-top:16px;border:1.5px dashed var(--indigo);border-radius:8px;
+    padding:12px 15px;background:var(--indigo-soft);font-size:0.92rem;color:var(--ink)}
+  .hintbox.show{display:block}
+  .hintbox .hlabel{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;font-weight:600;
+    letter-spacing:.1em;color:var(--indigo);display:block;margin-bottom:4px}
+  .hidden{display:none}
+  footer{
+    margin-top:36px;border-top:1px solid var(--line);padding-top:14px;
+    font-size:0.78rem;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>CCA-F <span class="hp">Honeypot</span> Drills</h1>
+    <div class="meta">25 scenarios &middot; keys 1&ndash;4 answer &middot; wrong pick shows a hint: retry or reveal &middot; first picks score</div>
+  </header>
+
+  <div class="chips" id="chips" role="tablist" aria-label="Domain filter">
+    <button class="chip on" data-f="ALL">ALL 25</button>
+    <button class="chip" data-f="D1">D1 &middot; AGENTIC ARCHITECTURE</button>
+    <button class="chip" data-f="D2">D2 &middot; TOOL DESIGN &amp; MCP</button>
+    <button class="chip" data-f="D3">D3 &middot; CLAUDE CODE CONFIG</button>
+    <button class="chip" data-f="D4">D4 &middot; PROMPT ENG &amp; STRUCTURED OUTPUT</button>
+    <button class="chip" data-f="D5">D5 &middot; CONTEXT &amp; RELIABILITY</button>
+  </div>
+
+  <div class="prog" id="progrow">
+    <span id="progtext">Q 1 / 25</span>
+    <div class="prog-rail"><div class="prog-fill" id="progfill"></div></div>
+    <span id="scoretext">0 correct</span>
+  </div>
+
+  <main id="stage" aria-live="polite"></main>
+
+  <footer>
+    Drill discipline: before revealing, say out loud which option is the honeypot and why it tempts you. The exam rewards that reflex, and knowing the material only gets you to two finalists.
+  </footer>
+</div>
+<script>
+/* ---------------- data ---------------- */
+const DOMAINS = {
+  D1:{name:"Agentic Architecture & Orchestration"},
+  D2:{name:"Tool Design & MCP Integration"},
+  D3:{name:"Claude Code Config & Workflows"},
+  D4:{name:"Prompt Eng & Structured Output"},
+  D5:{name:"Context Mgmt & Reliability"}
+};
+
+const QUESTIONS = [
+/* ================= DOMAIN 4 ================= */
+{
+ id:1, domain:"D4", sub:"Structured output guarantees", hint:"The requirement is guarantee, not improvement. Ask of each finalist: after this change, is invalid JSON still possible at all?",
+ scenario:"A production pipeline extracts invoice fields via the API. About 2% of responses fail json.loads: sometimes a preamble like \u201cHere is the JSON:\u201d, sometimes a trailing comma. The team must guarantee every response parses.",
+ stem:"What should the team do?",
+ options:[
+  {k:"honeypot", text:"Add \u201cRespond ONLY with valid JSON, no preamble or commentary\u201d to the system prompt, and strip non-JSON text with a regex before parsing.",
+   why:"Prompt instructions are probabilistic and the regex is brittle. This lowers the failure rate without eliminating it, which fails the stated requirement: guarantee.",
+   note:"Tempting because it directly addresses both observed symptoms and would visibly reduce failures."},
+  {k:"correct", text:"Constrain the response with structured outputs (a JSON schema via output_config.format) so the API only returns schema-valid JSON.",
+   why:"Constrained decoding is the only option here that turns \u201cusually parses\u201d into \u201calways parses\u201d. The requirement word is guarantee, so the answer must be a mechanism, not a request. (Docs note two exceptions where output can still fall short of the schema: refusals and max_tokens truncation, which is why stop_reason handling still belongs in the pipeline.)"},
+  {k:"wrong", text:"Set temperature to 0 and retry failed requests up to three times.",
+   why:"Reduces variance and adds cost and latency, but provides no validity guarantee. Retries are for transient errors, not for output-format contracts."},
+  {k:"wrong", text:"Prefill the assistant turn with an opening brace to force JSON.",
+   why:"A legacy technique that nudges format without guaranteeing validity. Also worth memorizing: prefilling is incompatible with JSON structured outputs, and the newest model generations have removed assistant prefill support entirely (the request itself returns a 400)."}
+ ],
+ pattern:"When the requirement says MUST or GUARANTEE, the answer is a platform mechanism (structured outputs, strict tool use), never stronger prompt wording."
+},
+{
+ id:2, domain:"D4", sub:"Feature incompatibilities", hint:"A 400 means the request itself is invalid. Ask whether this conflict is something you can tune away, or something architectural you must design around.",
+ scenario:"A compliance Q&A system must return a structured JSON verdict AND cite the exact source passages that support it. An engineer enables citations and sets output_config.format in the same request. The API returns a 400 error.",
+ stem:"What is the right move?",
+ options:[
+  {k:"wrong", text:"Retry with exponential backoff; 400s under load are usually transient.",
+   why:"400 is a client error signalling an invalid request, not a transient failure. Backoff applies to 429 and 529."},
+  {k:"honeypot", text:"Keep both features enabled but simplify the JSON schema until the request is accepted.",
+   why:"The conflict is architectural, not schema complexity: citations must interleave citation blocks with text, which cannot coexist with a strict JSON grammar. No schema simplification fixes a hard incompatibility.",
+   note:"Tempting because schema complexity IS a real cause of other structured-output errors, so it pattern-matches to prior experience."},
+  {k:"correct", text:"Split the work: one call with citations produces the grounded answer, a second call (or a tool schema with quote fields) structures the result.",
+   why:"Two-pass designs are the standard resolution for incompatible features. You keep the citation guarantee and the parse guarantee, each in the call that supports it."},
+  {k:"wrong", text:"Drop output_config.format and describe the schema in the system prompt instead.",
+   why:"This resolves the 400 but silently gives up the validity guarantee, reintroducing the parse failures structured outputs exist to prevent."}
+ ],
+ pattern:"Memorize the hard incompatibilities: citations + output_config.format returns 400; prefilling is incompatible with JSON outputs. When two guarantees conflict, split them across calls."
+},
+{
+ id:3, domain:"D4", sub:"Structured outputs \u00d7 caching", hint:"Nothing about the feature is broken. Ask what property of prompt caching decides whether a prefix is reusable, and what this turn changed.",
+ scenario:"A multi-turn agent carries a large cached system prompt. The team adds a final \u201csummary\u201d turn that switches output_config.format to a new response schema. Input cost on that final turn spikes to full price.",
+ stem:"Why did cost spike, and what is the fix?",
+ options:[
+  {k:"wrong", text:"The schema compiles into a grammar on every request, and grammar compilation is billed as input tokens.",
+   why:"Compiled schemas are cached server-side; compilation is not the billing driver here."},
+  {k:"correct", text:"Changing output_config.format invalidates the prompt cache for the conversation, so the whole prefix reprocessed at full price. Keep the format stable across the thread, or route the summary turn through a separate flow with its own cache.",
+   why:"Cache validity depends on the exact request prefix and configuration. A format change breaks it by design; the fix is architectural."},
+  {k:"honeypot", text:"Structured outputs disable prompt caching entirely, so remove them from multi-turn agents and validate JSON client-side.",
+   why:"Overgeneralization. Caching and structured outputs coexist fine; it is the mid-thread CHANGE of format that invalidates. Removing the feature trades away the parse guarantee for nothing.",
+   note:"Tempting because it correctly links the two features, and half-remembered incompatibility rules feel like this."},
+  {k:"wrong", text:"max_tokens on the summary turn is too low, causing billed retries.",
+   why:"Truncation surfaces as stop_reason max_tokens, not as an input-cost spike."}
+ ],
+ pattern:"Distinguish \u201cfeature X disables Y\u201d traps from the real rule: CHANGING a parameter mid-thread invalidates the cache. Exam options love to upgrade a nuance into a blanket prohibition."
+},
+{
+ id:4, domain:"D4", sub:"Few-shot example design", hint:"The model is doing exactly what it was shown. Ask what it was shown, and which option changes the demonstration rather than talking over it.",
+ scenario:"A support-ticket classifier uses five few-shot examples. All five are billing tickets and all five are short. In production, tickets from other categories keep getting labeled billing, and long tickets come back with clipped summaries mimicking the examples\u2019 length.",
+ stem:"What is the root-cause fix?",
+ options:[
+  {k:"wrong", text:"Add more billing examples, since billing is the highest-volume category.",
+   why:"Deepens the exact bias causing the misclassification."},
+  {k:"honeypot", text:"Strengthen the instructions: \u201cYou MUST evaluate every category with equal weight and never default to billing.\u201d",
+   why:"The model is not ignoring instructions; it is correctly generalizing from a skewed pattern in the examples. Examples steer harder than adjectives, so the fix belongs in the examples.",
+   note:"Tempting because the observed behavior reads like disobedience, and instruction-strengthening is the reflex response to disobedience."},
+  {k:"correct", text:"Rebuild the example set: 3 to 5 diverse examples spanning categories, lengths, and edge cases, wrapped in example tags so they are unambiguous.",
+   why:"Matches the documented guidance directly: relevant, diverse, structured. Diversity removes the unintended pattern the model latched onto."},
+  {k:"wrong", text:"Remove all examples so the model classifies without bias.",
+   why:"Throws away the most reliable steering tool available. The problem is example quality, not example presence."}
+ ],
+ pattern:"When outputs mirror an unintended property of your examples (category, length, tone), fix the examples. Instruction emphasis cannot outvote a consistent demonstrated pattern."
+},
+{
+ id:5, domain:"D4", sub:"Multi-pass review architecture", hint:"The review sounds thorough and ships bugs anyway. Ask what the reviewer can see that biases its conclusions, and which option removes that visibility rather than adjusting tone.",
+ scenario:"A code-generation pipeline has Claude write a module, then asks in the same conversation: \u201cNow critically review your code for bugs.\u201d Reviews consistently return \u201cno significant issues\u201d, yet bugs keep shipping.",
+ stem:"What change most improves defect detection?",
+ options:[
+  {k:"honeypot", text:"Rewrite the review prompt to be adversarial: \u201cAssume the code is broken. Be ruthless. Find every flaw.\u201d",
+   why:"Tone does not remove the structural bias: the model retains its own generation reasoning in context, so it re-derives the same conclusions. Intensity is not independence.",
+   note:"Tempting because harsher review prompts DO produce longer, more critical-sounding reviews, which looks like improvement."},
+  {k:"correct", text:"Send the code to a fresh Claude instance with no access to the generation conversation, and have it review independently.",
+   why:"An independent instance without the generator\u2019s reasoning context is measurably better at catching subtle issues. This is the documented multi-instance review pattern."},
+  {k:"wrong", text:"Enable extended thinking on the review turn so the model reasons more deeply.",
+   why:"Deeper reasoning over the same biased context. The self-review limitation persists within the session."},
+  {k:"wrong", text:"Require the review to list at least five issues before concluding.",
+   why:"Forces confabulated findings to hit a quota. Padding is not detection."}
+ ],
+ pattern:"Independence beats intensity. Separate the reviewer\u2019s context from the generator\u2019s; for large reviews, split per-file passes from cross-file integration passes."
+},
+
+/* ================= DOMAIN 3 ================= */
+{
+ id:6, domain:"D3", sub:"CLAUDE.md hierarchy & scope", hint:"Twelve private copies of a shared truth. Ask which memory scope is designed for exactly this audience, so the mechanism does the synchronizing instead of a process.",
+ scenario:"A 12-engineer team works in one repo. Each engineer pasted the repo\u2019s conventions into their personal ~/.claude/CLAUDE.md. New hires keep missing conventions, and the twelve copies have drifted apart.",
+ stem:"What is the correct configuration?",
+ options:[
+  {k:"honeypot", text:"Write a canonical onboarding doc specifying exactly what every engineer must paste into their user-level CLAUDE.md, and audit it quarterly.",
+   why:"Process discipline layered on the wrong mechanism. User-level memory is personal by design; twelve synchronized copies will drift again the week after the audit.",
+   note:"Tempting because it standardizes the content, which feels like solving the drift."},
+  {k:"correct", text:"Check a CLAUDE.md into the repo root so project context loads automatically for everyone and changes flow through version control.",
+   why:"Project-level memory is the mechanism built for exactly this scope: shared, automatic, reviewed via PRs, zero per-engineer setup."},
+  {k:"wrong", text:"Distribute the conventions through an enterprise-managed policy file.",
+   why:"Enterprise policy is for organization-wide rules. One repo\u2019s coding conventions do not belong at that scope, and most teams cannot ship to it quickly."},
+  {k:"wrong", text:"Create a /conventions slash command that prints the style guide on demand.",
+   why:"On-demand means optional. The failure mode is people not knowing to invoke it, which is the current failure mode."}
+ ],
+ pattern:"Match memory scope to audience: user-level = personal preferences, project-level (checked in) = team conventions, enterprise = org policy. Scope mismatch IS the bug."
+},
+{
+ id:7, domain:"D3", sub:"Programmatic enforcement", hint:"The word is NEVER, and a written rule already failed once. Ask which options the model can ignore, and which ones it physically cannot.",
+ scenario:"A repo contains infra/prod/. Policy: Claude Code must never modify files there, no matter what a prompt says. A CLAUDE.md instruction was added, but a session still edited a prod file last week.",
+ stem:"How should the policy be enforced?",
+ options:[
+  {k:"honeypot", text:"Escalate the CLAUDE.md wording: \u201cCRITICAL SECURITY RULE: NEVER modify anything under infra/prod/ under ANY circumstances.\u201d",
+   why:"Still a request to a probabilistic system. Capitalization changes the tone, not the enforcement class. The scenario already showed you prompt-based control failing once.",
+   note:"Tempting because emphatic instructions usually do raise compliance, and it is a ten-second change."},
+  {k:"correct", text:"Add a deny permission rule for edits under infra/prod/** in the checked-in project settings, or a PreToolUse hook that blocks matching Edit and Write calls.",
+   why:"Permissions and hooks are deterministic: the tool call is rejected before it executes, every time, regardless of what the prompt says. NEVER requires exactly this."},
+  {k:"wrong", text:"Require engineers to use plan mode whenever working near production paths.",
+   why:"Relies on humans remembering, which is the failure mode being fixed."},
+  {k:"wrong", text:"Remove infra/prod/ from the repository so Claude cannot see it.",
+   why:"Breaks legitimate workflows and confuses visibility with write protection."}
+ ],
+ pattern:"MUST and NEVER are enforcement words. Deterministic controls (permission deny rules, PreToolUse hooks) enforce; CLAUDE.md influences."
+},
+{
+ id:8, domain:"D3", sub:"Hooks vs conventions", hint:"The requirement is formatted immediately, every single time. Ask which option fires deterministically at the moment of the edit, rather than reminding before or checking after.",
+ scenario:"Team standard: every modified Go file is gofmt-formatted immediately, so later edits and diffs run against formatted code. A CLAUDE.md line says \u201calways run gofmt after editing Go files.\u201d Compliance is about 90%; CI keeps failing on the rest.",
+ stem:"What closes the last 10%?",
+ options:[
+  {k:"wrong", text:"Repeat the gofmt reminder inside every relevant slash command.",
+   why:"More copies of a probabilistic instruction; same enforcement class, more maintenance."},
+  {k:"honeypot", text:"Keep the CLAUDE.md rule and add a CI gate that rejects unformatted code.",
+   why:"Catches the symptom downstream, after the requirement (\u201cformatted immediately as Claude works\u201d) has already been violated. The feedback loop stays slow and the in-session diffs stay dirty.",
+   note:"Tempting because a CI gate is genuinely good engineering hygiene and does stop bad merges."},
+  {k:"correct", text:"Add a PostToolUse hook matched to Edit and Write that runs gofmt on the changed file.",
+   why:"Fires deterministically on every qualifying tool call, at the moment of the edit. 90% becomes 100% because compliance no longer depends on the model remembering."},
+  {k:"wrong", text:"Move the instruction to the top of CLAUDE.md and bold it.",
+   why:"Position and emphasis tweak probabilities. The requirement is a guarantee."}
+ ],
+ pattern:"Hooks turn conventions into guarantees at the moment of action. A downstream gate that catches violations is the classic symptom-patch honeypot."
+},
+{
+ id:9, domain:"D3", sub:"Headless / CI usage", hint:"You are scraping conversation text today. Ask which option gives you a supported machine-readable contract, versus a prettier thing to scrape.",
+ scenario:"A nightly job runs Claude Code to triage failing tests and must emit a machine-readable summary for the pipeline. Today it scrapes interactive-mode output with grep, and every UI change breaks the parser.",
+ stem:"What is the supported approach?",
+ options:[
+  {k:"correct", text:"Run headless: claude -p \u201c\u2026\u201d --output-format json, and parse the structured result.",
+   why:"The -p flag with JSON output format is the supported automation contract: non-interactive, stable, machine-readable. This exact combination is called out in the CI/CD exam scenario."},
+  {k:"honeypot", text:"Keep interactive mode but instruct Claude to end every session with a fenced JSON block, then parse the tail of the transcript.",
+   why:"Rebuilds a fragile parser on top of a prompt-level convention. You are still scraping a UI, just with nicer delimiters.",
+   note:"Tempting because it reuses the existing pipeline and \u201cend with JSON\u201d sounds like structured output."},
+  {k:"wrong", text:"Add --verbose and parse the detailed logs for test names and outcomes.",
+   why:"Logs are diagnostics, not an output contract. Even more brittle than the current grep."},
+  {k:"wrong", text:"Run the job in plan mode so the output is predictable.",
+   why:"Plan mode governs what Claude may do (read-only exploration before edits), not the output format."}
+ ],
+ pattern:"Automation questions want the supported contract: -p for non-interactive, --output-format json for parsing. Any answer that parses conversational text is the trap."
+},
+{
+ id:10, domain:"D3", sub:"Skills & progressive disclosure", hint:"The on-demand economics were the right call; the routing failed. Ask what mechanism decides when a skill loads, and which option fixes that mechanism.",
+ scenario:"A 900-line release-runbook lived in CLAUDE.md; it bloated every session\u2019s context and degraded unrelated tasks. The team moved it into a skill, but now Claude sometimes fails to use the runbook during releases.",
+ stem:"What is the fix?",
+ options:[
+  {k:"honeypot", text:"Move the runbook back into CLAUDE.md and train the team to run /clear frequently to manage the bloat.",
+   why:"Reintroduces the always-loaded cost and patches it with manual hygiene. The skill mechanism was the right call; it is the skill\u2019s discoverability that is broken.",
+   note:"Tempting because it provably fixes the \u201cClaude did not use the runbook\u201d complaint, and /clear is a real tool."},
+  {k:"correct", text:"Rewrite the skill\u2019s frontmatter description to state precisely when it applies (release tasks, trigger phrases, artifact types) so progressive disclosure loads it for the right work.",
+   why:"Skills load on demand by matching their description against the task. A vague description means no trigger. Fix the routing metadata, keep the on-demand economics."},
+  {k:"wrong", text:"Split the runbook across ten smaller CLAUDE.md sections to spread out the context cost.",
+   why:"Same total always-on tokens, now with fragmentation."},
+  {k:"wrong", text:"Convert the runbook into a subagent that owns releases end to end.",
+   why:"Subagents isolate execution context for delegated work. The runbook is procedural knowledge, which is what skills carry. Wrong primitive for the content type."}
+ ],
+ pattern:"Rules and memory are always-on; skills are on-demand and discovered via their description. When a skill does not trigger, debug the description, not the architecture."
+},
+
+/* ================= DOMAIN 5 ================= */
+{
+ id:11, domain:"D5", sub:"Context curation", hint:"The failure is attention, not capacity. Ask which option removes the stale content competing for attention, rather than buying room to accumulate more of it.",
+ scenario:"An autonomous monitoring agent makes 60+ tool calls per session. Late in each session it gets sloppy: re-reading files it already read, contradicting its own earlier findings. Sessions are running near the context limit.",
+ stem:"What is the root-cause fix?",
+ options:[
+  {k:"honeypot", text:"Move to a model tier with a larger context window so sessions stop running near the limit.",
+   why:"Buys headroom but keeps every stale tool result in context, and irrelevant content degrades focus regardless of remaining capacity. Same degradation, later onset, higher bill.",
+   note:"Tempting because the scenario plants \u201cnear the context limit\u201d as bait, and more capacity reads as the direct remedy."},
+  {k:"correct", text:"Enable context editing with tool-result clearing so stale results are removed as the session grows, keeping recent ones intact.",
+   why:"Attacks the actual cause: accumulated low-value content. Context is a finite resource with diminishing returns, and curation restores late-session quality."},
+  {k:"wrong", text:"Add \u201cCarefully track and honor your earlier findings\u201d to the system prompt.",
+   why:"The findings are buried under tool-result noise; the instruction cannot restore attention that context pollution took away."},
+  {k:"wrong", text:"Increase max_tokens so the agent has room to reason.",
+   why:"max_tokens budgets output. The problem lives on the input side."}
+ ],
+ pattern:"Degradation in long agentic sessions is a curation problem before it is a capacity problem. Clear stale tool results; do not just rent a bigger attic."
+},
+{
+ id:12, domain:"D5", sub:"Prompt caching mechanics", hint:"Reads went to zero immediately after the change, not gradually. Ask what property of the prefix decides a hit, and where the volatile content now sits.",
+ scenario:"An agent carries a 40K-token system prompt behind a cache breakpoint. A developer prepends \u201cCurrent time: {timestamp}\u201d to the TOP of the system prompt. Cache-read tokens drop to near zero and input costs triple.",
+ stem:"What happened?",
+ options:[
+  {k:"wrong", text:"Timestamps make responses non-deterministic, and non-deterministic requests are excluded from caching.",
+   why:"Caching keys on the request prefix, not on output determinism."},
+  {k:"correct", text:"The dynamic prefix changes the cached prefix on every request, so nothing upstream of it can ever hit. Move volatile content after the stable block, ideally into the user turn.",
+   why:"Prompt caching is prefix-based: identical stable content first, volatile content after. One changing token at the top invalidates everything below it."},
+  {k:"honeypot", text:"The cache TTL expired between requests; upgrade the breakpoint to the 1-hour TTL.",
+   why:"TTL is a real caching concept, which is what makes it bait. But requests here are frequent, and reads dropped to zero immediately after the change, which is the signature of prefix mutation, not expiry.",
+   note:"Tempting because TTL is the caching fact people remember, and it comes with a one-line \u201cfix\u201d."},
+  {k:"wrong", text:"A structured-output schema elsewhere in the request invalidated the cache.",
+   why:"A format change does invalidate cache, but nothing in the scenario changed output configuration. Do not import facts the scenario did not give you."}
+ ],
+ pattern:"Cache debugging: stable prefix first, volatile content last. Zero reads immediately after a change means prefix mutation; gradual misses over time means TTL."
+},
+{
+ id:13, domain:"D5", sub:"stop_reason handling", hint:"The API already told you why it stopped. Ask which option reads that signal in code, versus hoping the situation happens less often.",
+ scenario:"An extraction service occasionally returns JSON that ends mid-object. Logs show these responses have stop_reason \u201cmax_tokens\u201d. The parser currently treats every response as complete.",
+ stem:"What is the correct handling?",
+ options:[
+  {k:"honeypot", text:"Add \u201ckeep the JSON concise; omit optional fields when possible\u201d to the prompt to shrink responses under the limit.",
+   why:"Shrinks average size without bounding worst case, so truncation still occurs, just less often, and the parser still trusts incomplete output. The symptom fades; the defect remains.",
+   note:"Tempting because it would visibly reduce the failure rate this week."},
+  {k:"correct", text:"Handle stop_reason in code: treat max_tokens as an incomplete-response signal, never parse those payloads, and re-request with a higher limit or continue the generation.",
+   why:"stop_reason is the API\u2019s contract for why generation ended. Production systems branch on it; max_tokens means the response is truncated by definition."},
+  {k:"wrong", text:"Retry the identical request with exponential backoff until valid JSON returns.",
+   why:"Backoff addresses transient errors like 429 and 529. Truncation at the same limit is deterministic; identical retries mostly reproduce it."},
+  {k:"wrong", text:"Set temperature to 0 so responses are shorter and more predictable.",
+   why:"Temperature shapes sampling, not length limits."}
+ ],
+ pattern:"Know the stop_reason values (end_turn, max_tokens, stop_sequence, tool_use, refusal, pause_turn, model_context_window_exceeded) and what each demands from your code. \u201cThe response looked done\u201d is not a contract."
+},
+{
+ id:14, domain:"D5", sub:"Multi-agent provenance", hint:"The damage happened at the handoffs, before any report existed. Ask which option adds structure at the boundaries, rather than diligence at the end.",
+ scenario:"A coordinator fans research out to four subagents and synthesizes a report. The report mixes claims with no way to tell which subagent or source produced them; last week one subagent\u2019s bad output silently contaminated the conclusions.",
+ stem:"What is the structural fix?",
+ options:[
+  {k:"honeypot", text:"Add a verification subagent that reviews the final report for errors before delivery.",
+   why:"A post-hoc reviewer inspects a report whose provenance is already gone; it cannot tell a well-sourced claim from a contaminated one. It audits prose, not lineage.",
+   note:"Tempting because \u201cadd a reviewer\u201d is a legitimate reliability pattern elsewhere, and it feels rigorous."},
+  {k:"correct", text:"Require each subagent to return structured findings with source attribution and confidence, and have the coordinator synthesize with provenance preserved, quarantining any subagent output that fails validation.",
+   why:"Reliability in multi-agent systems is structural: schemas at the handoff, provenance through synthesis, isolation of failures. Contamination becomes traceable and containable."},
+  {k:"wrong", text:"Instruct the coordinator to double-check all facts before including them.",
+   why:"The coordinator has no independent access to verify against; exhortation without structure."},
+  {k:"wrong", text:"Move all research into the coordinator\u2019s own context to eliminate handoffs.",
+   why:"Destroys the context isolation that motivated subagents and floods the coordinator with raw research."}
+ ],
+ pattern:"Hub-and-spoke questions reward structure at the boundaries: typed handoffs, provenance, error quarantine. Answers that add diligence instead of structure are traps."
+},
+{
+ id:15, domain:"D5", sub:"Compaction quality", hint:"The summary is doing what it was told; the problem is what it was told. Ask which option changes the contract of what survives, not how often it runs.",
+ scenario:"A long-running coding agent auto-compacts when context fills. After compaction it retries an approach that was already tried and rejected, and forgets a constraint the user stated early in the session.",
+ stem:"What should change?",
+ options:[
+  {k:"wrong", text:"Disable compaction and let sessions run until they hit the context limit.",
+   why:"Trades gradual summarized loss for a hard stop, and long-horizon work still breaks."},
+  {k:"correct", text:"Customize the compaction summary structure so it explicitly preserves decisions made, failed approaches, user constraints, current state, and next steps.",
+   why:"Compaction quality is a function of what the summary is instructed to keep. The documented structure (task overview, current state, important discoveries, next steps, context to preserve) exists precisely to prevent repeated dead ends."},
+  {k:"honeypot", text:"Compact more frequently so each summary covers less ground and stays accurate.",
+   why:"Frequency does not change WHAT the summary captures; a summary that drops rejected approaches drops them every time, and more compaction cycles mean more chances to lose something.",
+   note:"Tempting because smaller batches genuinely help in other engineering contexts, so it sounds like sound practice."},
+  {k:"wrong", text:"Ask the user to restate constraints after each compaction event.",
+   why:"Externalizes the system\u2019s defect onto the user and does nothing for the forgotten failed approaches."}
+ ],
+ pattern:"When compaction loses information, fix the summary contract, not the schedule. Know the five things a good compaction summary preserves."
+},
+
+/* ================= DOMAIN 1 ================= */
+{
+ id:16, domain:"D1", sub:"Agent loop termination", hint:"The API already reports why each response ended. Ask which option reads that signal in code, versus guessing from the text.",
+ scenario:"A custom agent loop terminates when the response text contains “TASK COMPLETE”. Sometimes the agent stops early because the model echoed the phrase while planning; other runs spin until the 10-iteration safety cap silently cuts off legitimate long tasks.",
+ stem:"How should the loop decide when to stop?",
+ options:[
+  {k:"honeypot", text:"Replace the completion phrase with a distinctive sentinel token like <<DONE-8f3a>> so accidental echoes cannot match.",
+   why:"Still parses natural language to control the loop. The model can omit, mangle, or prematurely emit any sentinel; you have made the fragile mechanism harder to trip, not replaced it.",
+   note:"Tempting because it precisely fixes the observed false-positive, and unique delimiters are good practice elsewhere."},
+  {k:"correct", text:"Branch on stop_reason: execute tools and continue on tool_use, exit on end_turn, and keep the iteration cap only as a safety backstop, never as the primary stop.",
+   why:"stop_reason is the API’s contract for loop control. tool_use means keep going, end_turn means the model finished. Caps guard against runaways; they are not a termination mechanism."},
+  {k:"wrong", text:"Raise the iteration cap from 10 to 50 so long tasks can finish.",
+   why:"Fixes the early cutoff by worsening the runaway case, and the loop still cannot tell ‘finished’ from ‘stuck’."},
+  {k:"wrong", text:"Lower temperature so the model emits the completion phrase more consistently.",
+   why:"Sampling settings cannot make text parsing a reliable control signal."}
+ ],
+ pattern:"Loop control questions have two wrong-answer tells: parsing output text for termination, and iteration caps as the stop mechanism. The answer is always stop_reason-driven control flow."
+},
+{
+ id:17, domain:"D1", sub:"Subagent context passing", hint:"The subagent is not being lazy; it is blind. Ask what it can actually see at spawn time, and which option changes that.",
+ scenario:"A coordinator analyzes a customer-feedback dataset, then spawns a subagent with the prompt “Summarize the top complaints from the feedback we discussed.” The subagent returns generic, partly invented complaints. The developer is confused because “the data is right there in the conversation.”",
+ stem:"What is wrong, and what is the fix?",
+ options:[
+  {k:"honeypot", text:"Have the subagent ask the coordinator follow-up questions whenever it is missing context.",
+   why:"Adds round-trips and coordination machinery to work around the actual defect: the spawn prompt was incomplete. The documented pattern is to construct subagent prompts that include everything needed, precisely so the subagent does not have to come back for missing context.",
+   note:"Tempting because clarifying questions are how humans fix this, and it sounds adaptive."},
+  {k:"correct", text:"Subagents start with a fresh context and do not inherit the coordinator’s conversation. Pass all required findings, structured data, and source metadata explicitly in the spawn prompt.",
+   why:"No-inheritance is the core multi-agent fact this scenario tests. ‘The feedback we discussed’ refers to a conversation the subagent has never seen, so it fabricates."},
+  {k:"wrong", text:"Increase the subagent’s max_tokens so it has room to reason about the dataset.",
+   why:"Output budget cannot compensate for input the subagent never received."},
+  {k:"wrong", text:"Use a more capable model for the subagent.",
+   why:"A stronger model hallucinates more fluently about data it cannot see."}
+ ],
+ pattern:"Subagents never inherit the parent’s context. Every spawn prompt must carry its own complete brief: objective, data, sources, output format, and task boundaries."
+},
+{
+ id:18, domain:"D1", sub:"Orchestration pattern selection", hint:"Count the dependencies between subtopics. Ask which structure exploits independence instead of serializing it.",
+ scenario:"A team needs a market-landscape report covering eight independent subtopics, synthesized into one document with full coverage. Latency matters: the report is generated on demand while a customer waits. Subtopics share no intermediate results.",
+ stem:"Which architecture fits best?",
+ options:[
+  {k:"honeypot", text:"A sequential pipeline of specialized stages, so each stage can validate the previous stage’s output before building on it.",
+   why:"Validation-between-stages sounds rigorous, but there is nothing to validate across independent subtopics: no stage consumes another’s output. Serializing eight independent researches multiplies latency for zero reliability gain.",
+   note:"Tempting because ‘each stage validates the last’ reads as the responsible, careful choice."},
+  {k:"correct", text:"An orchestrator-worker design: a lead agent decomposes the task and spawns parallel subagents, each returning structured findings the lead synthesizes.",
+   why:"Independent subtopics are the textbook case for parallel workers: coverage through decomposition, latency through parallelism, one synthesis pass for coherence."},
+  {k:"wrong", text:"A single agent with a large context window researching all eight subtopics in one session.",
+   why:"Serial exploration, one context accumulating all eight threads, and late-session degradation. Loses on both latency and coverage."},
+  {k:"wrong", text:"Run the same full-report prompt eight times in parallel and have a judge pick the best output.",
+   why:"Voting suits verification of one contested answer, not division of labor across disjoint subtopics. Eight redundant full reports waste tokens and none guarantees coverage."}
+ ],
+ pattern:"Match the orchestration pattern to the dependency structure: independent subtasks want parallel workers; dependent stages want a pipeline; contested single answers want voting. Serializing independent work is the trap."
+},
+{
+ id:19, domain:"D1", sub:"Pipeline state persistence", hint:"The requirement is resume without repeating work. Ask where completed work lives when the process dies, under each option.",
+ scenario:"A nightly multi-agent migration pipeline runs nine steps over about 45 minutes, driven by API calls. When step 7 fails (a transient tool error), the team reruns the whole pipeline from step 1, repeating a costly analysis and occasionally getting different step-3 decisions on the rerun.",
+ stem:"What is the structural fix?",
+ options:[
+  {k:"honeypot", text:"Wrap the pipeline in retry logic with exponential backoff so transient failures no longer kill the run.",
+   why:"Retries help the individual failing call, but the requirement is resumption: when a run does die, completed work must survive. Backoff makes full restarts rarer without making them cheap, and the step-3 nondeterminism on reruns remains.",
+   note:"Tempting because the trigger was a transient error, and backoff is the standard cure for those."},
+  {k:"correct", text:"Checkpoint each completed step’s outputs and decisions to durable storage outside the model context; on restart, load the checkpoint and resume from the first incomplete step.",
+   why:"State persistence is the documented pattern for long-running agent pipelines: durable artifacts plus resume-from-checkpoint means no repeated work and no re-decided decisions."},
+  {k:"wrong", text:"Keep the whole pipeline in one conversation and rely on the transcript as the state record.",
+   why:"The transcript dies with the process and bloats the context; it is neither durable nor selective."},
+  {k:"wrong", text:"Have the pipeline re-derive prior steps quickly by summarizing what it probably did last run.",
+   why:"Reconstruction by guesswork; the ‘different step-3 decisions’ problem becomes the mechanism."}
+ ],
+ pattern:"Long-running pipelines need durable checkpoints: persist findings and decisions outside the context, resume from the last completed step. Retry logic complements checkpointing; it never replaces it."
+},
+{
+ id:20, domain:"D1", sub:"Escalation triggers", hint:"Two signals are being conflated: how the customer feels and whether the agent can do the job. Ask which option routes on the right one.",
+ scenario:"A support agent escalates to humans based on a sentiment classifier: angry tone routes to a person. Humans are now flooded with angry-but-trivial password resets, while a calm customer who wrote “please connect me to a human agent” three times keeps getting deflected with automated answers.",
+ stem:"How should escalation be redesigned?",
+ options:[
+  {k:"honeypot", text:"Tune the sentiment threshold and add the model’s self-reported confidence score as a second gate, escalating only low-confidence angry cases.",
+   why:"Refines two unreliable signals. Sentiment still is not complexity, so angry-trivial keeps leaking through at any threshold, and self-reported confidence is documented as an unreliable trigger. The explicit human request still is not honored.",
+   note:"Tempting because threshold tuning plus a confidence gate looks like a measured, data-driven fix."},
+  {k:"correct", text:"Escalate immediately on any explicit customer request for a human, and otherwise route on task properties: capability boundaries, repeated failed resolutions, and policy-sensitive actions.",
+   why:"Explicit requests are the one non-negotiable trigger. Beyond that, escalation keys on whether the agent can actually complete the task, not on how the customer sounds."},
+  {k:"wrong", text:"Prompt the agent to de-escalate angry customers with empathetic language before answering.",
+   why:"Tone management may be nice, but it does not decide who should handle the case, and it deepens the deflection problem."},
+  {k:"wrong", text:"Escalate every conversation that runs longer than five turns.",
+   why:"An arbitrary proxy in both directions: complex-but-progressing cases escalate needlessly, and quick failures stay stuck."}
+ ],
+ pattern:"Escalation triggers: explicit request = escalate immediately; sentiment is not complexity; self-reported confidence is not a reliable gate. Route on what the agent can do, not how the user sounds."
+},
+
+/* ================= DOMAIN 2 ================= */
+{
+ id:21, domain:"D2", sub:"Tool description quality", hint:"The model decides when to call a tool from its description. Ask which option fixes the information the routing decision is based on.",
+ scenario:"An agent has a tool named get_data described as “Gets data from the system.” It calls the tool for questions the tool cannot answer, and skips it for questions it exists to serve. The tool’s implementation is correct in both cases.",
+ stem:"What is the highest-leverage fix?",
+ options:[
+  {k:"honeypot", text:"Add a section to the system prompt listing example questions that should and should not trigger get_data.",
+   why:"Patches routing guidance into the wrong layer. The documented place for when-to-call guidance is the tool description itself, which travels with the tool everywhere it is used; system-prompt lists drift, bloat context, and do not scale past a few tools.",
+   note:"Tempting because worked examples genuinely help, so it feels like the thorough version of the fix."},
+  {k:"correct", text:"Rewrite the description to state what the tool returns, when to call it, input expectations, and its boundaries against similar tools (e.g., “Call this for current inventory counts by SKU; not for historical sales, see get_sales_history”).",
+   why:"Tool selection is driven by the description. Purpose, when-to-call, input format, and boundary lines against neighboring tools are exactly what the docs say a description must carry."},
+  {k:"wrong", text:"Rename the tool to fetch_inventory_data and keep the description.",
+   why:"A better name helps at the margin, but a one-line vague description still gives the model nothing to route on."},
+  {k:"wrong", text:"Set tool_choice to ‘any’ so the model always calls some tool.",
+   why:"Forces tool use on every turn; it makes over-triggering universal and fixes nothing about picking the right tool."}
+ ],
+ pattern:"Under- or over-triggering is a tool-description bug. Descriptions carry the routing contract: purpose, when to call, inputs, and boundaries versus semantically similar tools."
+},
+{
+ id:22, domain:"D2", sub:"tool_choice modes", hint:"The word is guarantee, and there is exactly one parameter whose job is forcing invocation. Ask which options merely make invocation more likely.",
+ scenario:"An extraction endpoint defines a record_extraction tool whose input schema is the desired output structure. Most responses call the tool, but a few reply conversationally instead (“I found the following fields…”), and those responses crash the downstream parser. The team must guarantee the tool is always invoked.",
+ stem:"What is the correct change?",
+ options:[
+  {k:"honeypot", text:"Add “You MUST always respond by calling record_extraction, never in prose” to the system prompt.",
+   why:"A prompt instruction is probabilistic; the failure rate drops but the guarantee does not exist. When a parameter exists to enforce the behavior, the emphatic instruction is the honeypot.",
+   note:"Tempting because it names the exact failure and would visibly reduce it."},
+  {k:"correct", text:"Set tool_choice to {\"type\":\"tool\",\"name\":\"record_extraction\"} so the model must call that tool.",
+   why:"tool_choice is the enforcement mechanism: auto lets the model decide, any forces some tool, and {type:\"tool\", name} forces the named tool. Guarantee questions resolve to the forced mode."},
+  {k:"wrong", text:"Improve the tool description so the model understands it should always extract.",
+   why:"Descriptions govern selection quality when the model has a choice; the requirement is to remove the choice."},
+  {k:"wrong", text:"Detect conversational responses downstream and re-request with a nudge.",
+   why:"A retry loop around a preventable failure; adds latency and still cannot guarantee the second attempt calls the tool."}
+ ],
+ pattern:"Know what each tool_choice value forces: auto (model decides), any (some tool), {type:\"tool\",name} (that tool), none (no tools). GUARANTEE + tool invocation = forced tool_choice, not louder prompts."
+},
+{
+ id:23, domain:"D2", sub:"Scoped tool distribution", hint:"The model is choosing among 25 loosely-related options on every call. Ask which option shrinks the decision surface instead of describing it harder.",
+ scenario:"A single agent holds 25 tools spanning CRM lookups, billing actions, log queries, and report generation. It regularly picks a plausible-but-wrong tool, and occasionally invokes billing actions during read-only research tasks.",
+ stem:"What is the architectural fix?",
+ options:[
+  {k:"honeypot", text:"Expand every tool description with detailed disambiguation notes explaining how it differs from each similar tool.",
+   why:"Description quality matters, but at 25 loosely-related tools the failure is decision complexity itself, and pairwise disambiguation notes grow quadratically. The documented pattern is to reduce the choice set per role, not to document your way around it. It also does nothing to stop out-of-role billing calls.",
+   note:"Tempting because ‘improve the descriptions’ is the correct answer to a different, smaller-scale D2 question."},
+  {k:"correct", text:"Split the work across specialized handlers or subagents, each holding only the 2–4 tools its role requires, with a router dispatching to them.",
+   why:"Scoped distribution reduces decision complexity and makes out-of-role invocation structurally impossible: the research handler simply does not have billing tools."},
+  {k:"wrong", text:"Prefix tool names by category (billing_, crm_, logs_) so the model can group them.",
+   why:"Naming hygiene, not a mechanism. All 25 remain in every decision, and billing_ tools remain callable during research."},
+  {k:"wrong", text:"Add “never use billing tools unless the task is billing-related” to the system prompt.",
+   why:"A probabilistic rule where tool scoping gives a structural guarantee."}
+ ],
+ pattern:"Many loosely-related tools on one agent is a wrong-answer tell. Scoped distribution: each agent gets only the tools its role needs, which both improves selection and structurally prevents out-of-role calls."
+},
+{
+ id:24, domain:"D2", sub:"MCP resources vs tools", hint:"The content never changes between calls, yet the agent spends turns hunting for it. Ask which MCP primitive exists for exposing content directly.",
+ scenario:"An MCP server fronts an internal knowledge base with three tools: list_docs, search_docs, read_doc. On cross-system queries the agent burns four to six exploratory tool calls (list, then search, then several reads) before it can even start answering, and often re-reads the same reference pages every session.",
+ stem:"How should the server design change?",
+ options:[
+  {k:"honeypot", text:"Add server-side caching so repeated list/search/read calls return faster and cheaper.",
+   why:"Optimizes the cost of each round trip without removing the round trips. The agent still spends turns discovering content that could have been surfaced directly; the exploration pattern is the defect, not its latency.",
+   note:"Tempting because caching is real engineering and visibly improves the metrics you are staring at."},
+  {k:"correct", text:"Expose the stable reference content as MCP resources so it can be discovered and attached directly, keeping tools for actions and parameterized queries.",
+   why:"That is the documented split: resources expose content for direct inclusion, tools perform operations. Stable reference pages as resources eliminate the exploratory call chain."},
+  {k:"wrong", text:"Merge the three tools into one omni_docs tool with a mode parameter.",
+   why:"Same call pattern behind one name; fewer tools, identical exploration cost."},
+  {k:"wrong", text:"Raise the agent’s max turn limit so exploration no longer exhausts the budget.",
+   why:"Budgets more waste instead of removing it."}
+ ],
+ pattern:"MCP resources expose content; MCP tools perform operations. Stable reference content served through exploratory tool calls is the tell that it should be a resource."
+},
+{
+ id:25, domain:"D2", sub:"MCP scopes & auth", hint:"Two requirements: shared with the team via the repo, and secrets never committed. Ask which option satisfies both at once.",
+ scenario:"An engineer adds an internal MCP server with claude mcp add, and it works on her machine, but teammates do not get it. The server needs an API key. The team wants the configuration shared through the repository without committing anyone’s credentials.",
+ stem:"What is the correct setup?",
+ options:[
+  {k:"honeypot", text:"Commit the .mcp.json with the API key inline; the repository is private, so exposure is limited to the team.",
+   why:"Solves sharing by committing a secret. Private repos leak through clones, forks, CI logs, and departures; credentials in version control is the anti-pattern the scope + env-expansion design exists to prevent.",
+   note:"Tempting because it is one commit, works immediately for everyone, and ‘private repo’ sounds like a mitigation."},
+  {k:"correct", text:"Re-add the server with project scope so .mcp.json is checked into the repo, and reference the key via environment variable expansion (e.g., ${INTERNAL_API_KEY}) that each engineer sets locally.",
+   why:"Project scope is the share-via-repo mechanism, and env expansion keeps the secret out of the file: config is shared, credentials are personal."},
+  {k:"wrong", text:"Have every engineer add the server at user scope so it is available across their projects.",
+   why:"User scope is personal: it follows the individual across their machine, not the project across the team. Twelve manual setups that drift, exactly what checked-in project scope avoids."},
+  {k:"wrong", text:"Document the server’s tools in CLAUDE.md so Claude knows how to call them.",
+   why:"CLAUDE.md is instructions, not registration. Describing tools does not connect a server."}
+ ],
+ pattern:"Know the three MCP scopes: local (just you, this project), project (checked-in .mcp.json, shared via repo), user (you, across projects). Secrets ride environment variable expansion, never the committed file."
+}
+];
+
+/* ---------------- state & logic ---------------- */
+const KEYS = ["1","2","3","4"];
+let filter = "ALL";
+let order = [];
+let idx = 0;
+let answers = {};       // qid -> {pick, correct, trapped, attempts, revealed}
+let resolved = false;
+let firstPick = null;
+let attempts = 0;
+let pickedSet = new Set();
+
+const stage = document.getElementById("stage");
+const progtext = document.getElementById("progtext");
+const progfill = document.getElementById("progfill");
+const scoretext = document.getElementById("scoretext");
+
+function interleave(qs){
+  const by = {D1:[],D2:[],D3:[],D4:[],D5:[]};
+  qs.forEach(q=>by[q.domain].push(q));
+  const out=[]; let i=0;
+  while(out.length<qs.length){
+    ["D1","D2","D3","D4","D5"].forEach(d=>{ if(by[d][i]) out.push(by[d][i]); });
+    i++;
+  }
+  return out;
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function buildOrder(){
+  let qs = QUESTIONS.filter(q=>filter==="ALL"||q.domain===filter);
+  order = (filter==="ALL"?interleave(qs):qs.slice()).map(q=>({
+    q, opts: shuffle(q.options.map((o,i)=>({...o,_i:i})))
+  }));
+  idx = 0; answers = {};
+}
+function correctCount(){ return Object.values(answers).filter(a=>a.correct).length; }
+
+function renderQuestion(){
+  resolved = false; firstPick = null; attempts = 0; pickedSet = new Set();
+  const item = order[idx], q = item.q;
+  progtext.textContent = `Q ${idx+1} / ${order.length}`;
+  progfill.style.width = `${(idx/order.length)*100}%`;
+  scoretext.textContent = `${correctCount()} correct`;
+
+  const optHtml = item.opts.map((o,i)=>`
+    <button class="opt" data-i="${i}" aria-describedby="rat">
+      <span class="key">${i+1}</span>
+      <span class="body"><span class="verdict hidden"></span><span class="otext">${o.text}</span><span class="why hidden">${o.why}${o.note?`<br><em>Why it tempts: ${o.note}</em>`:""}</span></span>
+    </button>`).join("");
+
+  stage.innerHTML = `
+    <div class="qcard">
+      <div class="eyebrow">
+        <span class="dtag">${q.domain} \u00b7 ${DOMAINS[q.domain].name.toUpperCase()}</span>
+        <span class="stag">${q.sub.toUpperCase()}</span>
+      </div>
+      <div class="scenario"><span class="slabel">SCENARIO</span>${q.scenario}</div>
+      <div class="stem">${q.stem}</div>
+      <div class="opts">${optHtml}</div>
+      <div class="hintbox" id="hintbox"><span class="hlabel">HINT \u00b7 TRY AGAIN OR REVEAL</span><span id="hinttext"></span></div>
+      <div class="rationale" id="rat">
+        <div class="result-line" id="resline"></div>
+        <div class="pattern"><span class="plabel">PATTERN</span>${q.pattern}</div>
+      </div>
+      <div class="btnrow">
+        <button class="btn ghost hidden" id="revealbtn">Reveal answer</button>
+        <button class="btn hidden" id="nextbtn">${idx===order.length-1?"See results \u2192":"Next \u2192"}</button>
+      </div>
+    </div>`;
+
+  stage.querySelectorAll(".opt").forEach(btn=>{
+    btn.addEventListener("click",()=>answer(parseInt(btn.dataset.i,10)));
+  });
+  document.getElementById("nextbtn").addEventListener("click",next);
+  document.getElementById("revealbtn").addEventListener("click",()=>resolve(true));
+}
+
+function answer(i){
+  if(resolved || pickedSet.has(i)) return;
+  const item = order[idx], q = item.q;
+  const o = item.opts[i];
+  attempts++;
+  pickedSet.add(i);
+
+  if(firstPick===null){
+    firstPick = i;
+    answers[q.id] = {pick:i, correct:o.k==="correct", trapped:o.k==="honeypot", attempts:1, revealed:false};
+    scoretext.textContent = `${correctCount()} correct`;
+  }
+  answers[q.id].attempts = attempts;
+
+  if(o.k==="correct"){
+    resolve(false);
+    return;
+  }
+
+  // wrong pick: mark it, show only the hint, allow retry or reveal
+  const btn = stage.querySelectorAll(".opt")[i];
+  btn.disabled = true;
+  btn.classList.add("reveal-wrongpick","picked");
+  const v = btn.querySelector(".verdict");
+  v.textContent = "NOT IT";
+  v.classList.remove("hidden");
+
+  document.getElementById("hinttext").textContent = q.hint;
+  document.getElementById("hintbox").classList.add("show");
+  document.getElementById("revealbtn").classList.remove("hidden");
+}
+
+function resolve(viaReveal){
+  if(resolved) return;
+  resolved = true;
+  const item = order[idx], q = item.q;
+  const rec = answers[q.id] || (answers[q.id]={pick:null, correct:false, trapped:false, attempts:attempts, revealed:true});
+  rec.revealed = viaReveal;
+
+  stage.querySelectorAll(".opt").forEach((btn,j)=>{
+    btn.disabled = true;
+    const o = item.opts[j];
+    const v = btn.querySelector(".verdict"), w = btn.querySelector(".why");
+    btn.classList.remove("reveal-wrongpick");
+    if(o.k==="correct"){
+      btn.classList.add("reveal-correct");
+      v.textContent = "ROOT CAUSE"; v.classList.remove("hidden"); w.classList.remove("hidden");
+    } else if(o.k==="honeypot"){
+      btn.classList.add("reveal-honeypot");
+      v.textContent = "\u2B22 HONEYPOT"; v.classList.remove("hidden"); w.classList.remove("hidden");
+    } else if(pickedSet.has(j)){
+      btn.classList.add("reveal-wrongpick");
+      v.textContent = "YOUR PICK"; v.classList.remove("hidden"); w.classList.remove("hidden");
+    }
+    if(pickedSet.has(j)) btn.classList.add("picked");
+  });
+
+  const res = document.getElementById("resline");
+  if(!viaReveal && rec.correct){
+    res.textContent = "Correct on the first pick. That is the root-cause answer.";
+    res.className = "result-line good";
+  } else if(!viaReveal && rec.trapped){
+    res.textContent = `Found it on attempt ${attempts}, but the first pick took the honeypot. Only first picks score.`;
+    res.className = "result-line trapped";
+  } else if(!viaReveal){
+    res.textContent = `Found it on attempt ${attempts}. Only first picks score.`;
+    res.className = "result-line bad";
+  } else if(rec.trapped){
+    res.textContent = "Revealed. Your first pick was the honeypot; compare it against the root cause.";
+    res.className = "result-line trapped";
+  } else {
+    res.textContent = "Revealed. Compare your picks against the root cause and the honeypot.";
+    res.className = "result-line bad";
+  }
+
+  document.getElementById("hintbox").classList.remove("show");
+  document.getElementById("revealbtn").classList.add("hidden");
+  document.getElementById("rat").classList.add("show");
+  document.getElementById("nextbtn").classList.remove("hidden");
+  scoretext.textContent = `${correctCount()} correct`;
+}
+
+function next(){
+  if(idx < order.length-1){ idx++; renderQuestion(); }
+  else renderSummary();
+}
+
+function renderSummary(){
+  progtext.textContent = `Done`;
+  progfill.style.width = "100%";
+  const doms = filter==="ALL"?["D1","D2","D3","D4","D5"]:[filter];
+  const rows = doms.map(d=>{
+    const qs = order.filter(it=>it.q.domain===d);
+    const got = qs.filter(it=>answers[it.q.id] && answers[it.q.id].correct).length;
+    const pct = qs.length?Math.round(100*got/qs.length):0;
+    return `<div class="dom-row">
+      <div class="dom-head"><span class="nm">${d} \u00b7 ${DOMAINS[d].name}</span><span class="pc">${got}/${qs.length} \u00b7 ${pct}%</span></div>
+      <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="legend"><span>drill accuracy (first picks)</span></div>
+    </div>`;
+  }).join("");
+
+  const trapped = order.filter(it=>answers[it.q.id] && answers[it.q.id].trapped);
+  const missed = order.filter(it=>answers[it.q.id] && !answers[it.q.id].correct);
+  const total = order.length, got = correctCount();
+
+  stage.innerHTML = `
+    <div class="qcard sum">
+      <h2>${got}/${total} \u00b7 ${Math.round(100*got/total)}%</h2>
+      <p class="subtitle">${missed.length===0?"Clean run on first picks.":`Scoring counts first picks only. ${trapped.length} of your ${missed.length} first-pick misses were honeypots${trapped.length?", which is exactly the reflex to keep training":""}.`} Aim for 85%+ per domain here before sitting the exam.</p>
+      ${rows}
+      ${missed.length?`<div class="missed"><h3>Revisit these</h3><ul>${missed.map(it=>`<li><span class="mono">${answers[it.q.id].trapped?"HONEYPOT":"MISS"}</span> &middot; ${it.q.domain} &middot; ${it.q.sub}: ${it.q.pattern}</li>`).join("")}</ul></div>`:`<div class="missed"><h3>Clean run</h3><ul><li>Every trap identified on the first pick. Reshuffle and run again tomorrow to confirm it holds, then move to the labs.</li></ul></div>`}
+      <div class="btnrow">
+        ${missed.length?`<button class="btn ghost" id="retrymissed">Retry missed only</button>`:""}
+        <button class="btn" id="restart">Reshuffle &amp; restart</button>
+      </div>
+    </div>`;
+
+  document.getElementById("restart").addEventListener("click",()=>{buildOrder();renderQuestion();});
+  const rm = document.getElementById("retrymissed");
+  if(rm) rm.addEventListener("click",()=>{
+    const missedItems = missed.map(it=>it.q);
+    order = missedItems.map(q=>({q, opts: shuffle(q.options.map((o,i)=>({...o,_i:i})))}));
+    idx=0; answers={}; renderQuestion();
+  });
+}
+
+/* filter chips */
+document.getElementById("chips").addEventListener("click",e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+  b.classList.add("on");
+  filter = b.dataset.f;
+  buildOrder(); renderQuestion();
+});
+
+/* keyboard */
+document.addEventListener("keydown",e=>{
+  if(KEYS.includes(e.key) && !resolved && stage.querySelector(".opt")){
+    const i = parseInt(e.key,10)-1;
+    const btns = stage.querySelectorAll(".opt");
+    if(btns[i] && !btns[i].disabled) answer(i);
+  } else if(e.key==="Enter" && resolved && stage.querySelector("#nextbtn")){
+    next();
+  }
+});
+
+buildOrder();
+renderQuestion();
+</script>
+</body>
+</html>
