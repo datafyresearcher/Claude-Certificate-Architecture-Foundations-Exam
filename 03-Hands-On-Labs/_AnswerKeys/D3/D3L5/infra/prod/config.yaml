@@ -1,0 +1,4 @@
+environment: production
+database_url: prod-db.internal:5432
+api_key: sk-prod-secret-key
+replicas: 3
