@@ -38,7 +38,7 @@ A complete, self-contained preparation kit for the **Claude Certified Architect 
 
 ### ⭐ Udemy Practice Tests — 25 Practice Sets
 
-The **[Udemy Practice Tests index](CCA-F%20Exams%20Prepration/learning/practice-tests.md)** is one of the most important local resources in this repository. It contains **25 practice tests** for building question volume, recognizing recurring architecture patterns, strengthening elimination skills, and exposing weak domains before exam day.
+The **[Udemy Practice Tests index](06-Practice-Tests/udemy-practice-tests.md)** is one of the most important local resources in this repository. It contains **25 practice tests** for building question volume, recognizing recurring architecture patterns, strengthening elimination skills, and exposing weak domains before exam day.
 
 Use the collection deliberately:
 
@@ -62,6 +62,7 @@ Use the collection deliberately:
 | [`03-Hands-On-Labs/_AnswerKeys/`](03-Hands-On-Labs/_AnswerKeys/README.md) | Worked solutions and reference outputs; attempt each lab before opening its answer key |
 | [`04-Community-Resources/`](04-Community-Resources/community-links.md) | Unofficial preparation sites and guides, with cautions about documentation drift |
 | [`05-Exam-Day/`](05-Exam-Day/exam-strategy.md) | One-page strategy and terminology review for the final 24 hours |
+| [`06-Practice-Tests/`](06-Practice-Tests/udemy-practice-tests.md) | Index of 25 Udemy practice tests for question volume and timed preparation |
 
 ## Suggested Study Path
 
