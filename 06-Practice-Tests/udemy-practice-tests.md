@@ -26,8 +26,8 @@ Build confidence, sharpen your reasoning, and measure your readiness for the **C
 
 | Test | Exam | Access |
 | ---: | :--- | :---: |
-| **01** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://bit.ly/3RccpEO)** |
-| **02** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://bit.ly/4gCfsQZ)** |
+| **01** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://tinyurl.com/24njacsa)** |
+| **02** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://tinyurl.com/mphu4jys)** |
 | **03** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://tinyurl.com/5da2m4k4)** |
 | **04** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://tinyurl.com/33fnrpma)** |
 | **05** | Claude Certified Architect – Foundations (v2.0) | **[Start Test →](https://tinyurl.com/2xa3f9ub)** |
